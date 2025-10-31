@@ -7,9 +7,6 @@
 
 ;;; Code:
 
-;; Require dependencies
-(require 'general)
-
 ;; Yaml block styling
 (defun find-yaml-block ()
   "Find the first thing that appears to be a YAML block."
@@ -449,25 +446,18 @@ Returns (matched-pairs unmatched-divs)."
   (forward-line -1)  ; Move up one line to the empty line
   (refresh-code-block-highlights))
 
-;; keybindings
 (with-eval-after-load 'markdown-mode
-  (general-create-definer my-leader-def
-    :states '(normal visual)
-    :keymaps 'markdown-mode-map
-    :prefix "SPC")
-
-  (my-leader-def
-    "n" 'goto-next-code-block
-    "m" 'goto-prev-code-block
-    "u" 'refresh-code-block-highlights
-    "r" 'run-code-block
-    "a" 'run-all-code-blocks-above
-    "b" 'run-all-code-blocks-below
-    "i" 'insert-quarto-code-block
-    "s" 'insert-style-block
-    "j" 'insert-script-block
-    "q" 'insert-div-block
-    "k" 'quarto-preview))
+  (define-key markdown-mode-map (kbd "C-c n") 'goto-next-code-block)
+  (define-key markdown-mode-map (kbd "C-c p") 'goto-prev-code-block)
+  (define-key markdown-mode-map (kbd "C-c u") 'refresh-code-block-highlights)
+  (define-key markdown-mode-map (kbd "C-c r") 'run-code-block)
+  (define-key markdown-mode-map (kbd "C-c a") 'run-all-code-blocks-above)
+  (define-key markdown-mode-map (kbd "C-c b") 'run-all-code-blocks-below)
+  (define-key markdown-mode-map (kbd "C-c i") 'insert-quarto-code-block)
+  (define-key markdown-mode-map (kbd "C-c s") 'insert-style-block)
+  (define-key markdown-mode-map (kbd "C-c j") 'insert-script-block)
+  (define-key markdown-mode-map (kbd "C-c d") 'insert-div-block)
+  (define-key markdown-mode-map (kbd "C-c k") 'quarto-preview))
 
 ;; automatic application on file open
 (defun better-quarto-setup ()

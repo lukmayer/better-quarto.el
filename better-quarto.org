@@ -12,21 +12,31 @@ Keyboard shortcuts and styling functions for Quarto files in Emacs, including:
 - REPL integration via vterm
 - ...and more!
 
+
 * Disclaimers
 My code assumes you:
 - are working with quarto markdown (.qmd) as opposed to e.g. R markdown (.rmd)
 - use General.el (keybindings are with SPC leader)
 - have quarto-mode installed (e.g. SPC-k runs quarto-preview) 
 
+
 * Workflow
-- Insert code blocks with SPC-i
-- Navigate up and down code-chunks with SPC-m and SPC-n
-- Run code blocks in REPL via vterm with SPC-r (caveat: have to be on the ```lang line for this to work)
-- Run above/below code blocks with SPC-a and SPC-b 
-- Update styling with SPC-u
-- Render document with SPC-k
-- Insert HTML style block with SPC-s, HTML script blocks with SPC-j
-- Insert quarto divs with SPC-q
+- Insert code blocks with C-c-i
+- Navigate up and down code-chunks with C-c-m and SPC-n (Only works when cursor is not inside code-chunks)
+- Run code blocks in REPL via vterm with C-c-r (caveat: have to be on the ```lang line for this to work)
+- Run above/below code blocks with C-c-a and C-c-b 
+- Update styling with C-c-u
+- Render document with C-c-k
+- Insert HTML style block with C-c-s, HTML script blocks with C-c-j
+- Insert quarto divs with C-c-q
+
+
+* TODO
+- Allow white space in YAML block detection
+- highlight latex equations
+- fix vterm buffer naming
+- preview latex with math-preview
+- include vterm and quarto-mode as dependencies
   
 
 * Setup
@@ -39,10 +49,8 @@ My code assumes you:
 ;;; Color changes to make YAML, code blocks, divs more appealing
 
 ;;; Code:
-
-;; Require dependencies
-(require 'general)
 #+end_src
+
 
 * YAML Block Styling
 Highlight YAML frontmatter with background color.
@@ -82,6 +90,7 @@ Highlight YAML frontmatter with background color.
   (interactive)
   (remove-overlays (point-min) (point-max) 'yaml-highlight t))
 #+end_src
+
 
 * Code Block highlighting
 Highlight interactive code blocks
@@ -551,31 +560,23 @@ This is quite useful for advanced Quarto users.
 
 
 
-* General.el keyboard shortcuts
-
-I use evil-bindings so this was more convenient for me.
+* Keyboard shortcuts
 
 #+begin_src emacs-lisp :tangle better-quarto.el
-  ;; keybindings
-  (with-eval-after-load 'markdown-mode
-    (general-create-definer my-leader-def
-      :states '(normal visual)
-      :keymaps 'markdown-mode-map
-      :prefix "SPC")
-
-    (my-leader-def
-      "n" 'goto-next-code-block
-      "m" 'goto-prev-code-block
-      "u" 'refresh-code-block-highlights
-      "r" 'run-code-block
-      "a" 'run-all-code-blocks-above
-      "b" 'run-all-code-blocks-below
-      "i" 'insert-quarto-code-block
-      "s" 'insert-style-block
-      "j" 'insert-script-block
-      "q" 'insert-div-block
-      "k" 'quarto-preview))
+(with-eval-after-load 'markdown-mode
+  (define-key markdown-mode-map (kbd "C-c n") 'goto-next-code-block)
+  (define-key markdown-mode-map (kbd "C-c p") 'goto-prev-code-block)
+  (define-key markdown-mode-map (kbd "C-c u") 'refresh-code-block-highlights)
+  (define-key markdown-mode-map (kbd "C-c r") 'run-code-block)
+  (define-key markdown-mode-map (kbd "C-c a") 'run-all-code-blocks-above)
+  (define-key markdown-mode-map (kbd "C-c b") 'run-all-code-blocks-below)
+  (define-key markdown-mode-map (kbd "C-c i") 'insert-quarto-code-block)
+  (define-key markdown-mode-map (kbd "C-c s") 'insert-style-block)
+  (define-key markdown-mode-map (kbd "C-c j") 'insert-script-block)
+  (define-key markdown-mode-map (kbd "C-c d") 'insert-div-block)
+  (define-key markdown-mode-map (kbd "C-c k") 'quarto-preview))
 #+end_src
+
 
 * Apply styles on file open
 
@@ -600,4 +601,5 @@ This function simply applies the refresh function when you first open a file.
 
 ;;; better-quarto.el ends here
 #+end_src
+
 
