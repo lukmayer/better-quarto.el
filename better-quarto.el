@@ -306,11 +306,23 @@ Returns (matched-pairs unmatched-divs)."
     ("r" . "radian")
     ("julia" . "julia"))
   "Mapping of code block language names to REPL commands.")
-;; TODO: allow short format e.g. py and jl
+
+(defvar vterm-repl-language-aliases
+  '(("py" . "python")
+    ("jl" . "julia"))
+  "Mapping of short language names to full names.")
+
+(defun normalize-language-name (language)
+  "Convert short language names to canonical names."
+  (let ((alias (assoc language vterm-repl-language-aliases)))
+    (if alias
+        (cdr alias)      
+      language)))       
 
 (defun send-code-to-vterm (code language)
   "Send CODE to the appropriate vterm buffer based on LANGUAGE."
-  (let* ((buffer-name (format "*vterm-%s*" language))
+(let* ((language (normalize-language-name language))  
+         (buffer-name (format "*vterm-%s*" language))
          (repl-command (cdr (assoc language vterm-repl-commands))))
 
     (unless repl-command
