@@ -1,5 +1,5 @@
 ;;; better-quarto.el --- helpful functions for using quarto in emacs
-;; Package-Requires: ((emacs "26.1") (general "0.5"))
+;; Package-Requires: ((emacs "26.1") 
 ;;; Commentary:
 ;;; Keyboard-shortcuts for navigating cells
 ;;; Keyboard-shortcuts for pasting code-chunks into a REPL via vterm
@@ -446,18 +446,34 @@ Returns (matched-pairs unmatched-divs)."
   (forward-line -1)  ; Move up one line to the empty line
   (refresh-code-block-highlights))
 
-(with-eval-after-load 'markdown-mode
-  (define-key markdown-mode-map (kbd "C-c n") 'goto-next-code-block)
-  (define-key markdown-mode-map (kbd "C-c p") 'goto-prev-code-block)
-  (define-key markdown-mode-map (kbd "C-c u") 'refresh-code-block-highlights)
-  (define-key markdown-mode-map (kbd "C-c r") 'run-code-block)
-  (define-key markdown-mode-map (kbd "C-c a") 'run-all-code-blocks-above)
-  (define-key markdown-mode-map (kbd "C-c b") 'run-all-code-blocks-below)
-  (define-key markdown-mode-map (kbd "C-c i") 'insert-quarto-code-block)
-  (define-key markdown-mode-map (kbd "C-c s") 'insert-style-block)
-  (define-key markdown-mode-map (kbd "C-c j") 'insert-script-block)
-  (define-key markdown-mode-map (kbd "C-c d") 'insert-div-block)
-  (define-key markdown-mode-map (kbd "C-c k") 'quarto-preview))
+(defvar better-quarto-mode-map
+  (let ((map (make-sparse-keymap)))
+    ;; navigation
+    (define-key map (kbd "C-c n") #'goto-next-code-block)
+    (define-key map (kbd "C-c p") #'goto-prev-code-block)
+    ;; highlight refresh
+    (define-key map (kbd "C-c u") #'refresh-code-block-highlights)
+    ;; execution
+    (define-key map (kbd "C-c r") #'run-code-block)
+    (define-key map (kbd "C-c a") #'run-all-code-blocks-above)
+    (define-key map (kbd "C-c b") #'run-all-code-blocks-below)
+    ;; insertion helpers
+    (define-key map (kbd "C-c i") #'insert-quarto-code-block)
+    (define-key map (kbd "C-c s") #'insert-style-block)
+    (define-key map (kbd "C-c j") #'insert-script-block)
+    (define-key map (kbd "C-c d") #'insert-div-block)
+    ;; preview
+    (define-key map (kbd "C-c k") #'quarto-preview)
+    map)
+  "Keymap for `better-quarto-mode'.")
+
+(define-minor-mode better-quarto-mode
+  "Extra helpers and keybindings for editing Quarto *.qmd files."
+  :lighter " BQ"              ; text shown in the mode line
+  :keymap better-quarto-mode-map)
+
+(add-hook 'quarto-mode-hook   #'better-quarto-mode) 
+(add-hook 'markdown-mode-hook #'better-quarto-mode)
 
 ;; automatic application on file open
 (defun better-quarto-setup ()
